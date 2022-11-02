@@ -1,2 +1,0 @@
-[console_scripts]
-sort_css = sort_css_heloint.sort_css:main
