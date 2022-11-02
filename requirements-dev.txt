@@ -1,0 +1,15 @@
+attrs==22.1.0
+beautifulsoup4==4.11.1
+bs4==0.0.1
+cssutils==2.6.0
+exceptiongroup==1.0.0
+iniconfig==1.1.1
+mypy==0.982
+mypy-extensions==0.4.3
+packaging==21.3
+pluggy==1.0.0
+pyparsing==3.0.9
+pytest==7.2.0
+soupsieve==2.3.2.post1
+tomli==2.0.1
+typing_extensions==4.4.0
