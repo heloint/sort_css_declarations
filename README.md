@@ -10,8 +10,8 @@ pip install sort_css
 
 ## Console scripts
 
-Consult `sort_css --help` for the full set of options.
-`sort_css` takes filenames as positional arguments.
+Consult `sort-css --help` for the full set of options.
+`sort-css` takes filenames as positional arguments.
 
 Common options:
 - `-h, --help`         show this help message and exit
@@ -22,27 +22,27 @@ Common options:
 
 Result directly goes to stdout.
 ```bash
-sort_css test_dir/test_css.css
+sort-css test_dir/test_css.css
 ```
 
 File will be edited in-place with the result.
 ```bash
-sort_css -i test_dir/test_css.css
+sort-css -i test_dir/test_css.css
 ```
 
 Redirect the stdout to a new file.
 ```bash
-sort_css test_dir/test_css.css > test_dir/cleaned_css.css
+sort-css test_dir/test_css.css > test_dir/cleaned_css.css
 ```
 
 Result reordered by html directly goes to stdout.
 ```bash
-sort_css test_dir/test_css.css
+sort-css test_dir/test_css.css
 ```
 
 Reorder by html and redirect the stdout to a new file.
 ```bash
-sort_css test_dir/test_css.css --by_html test_dir/test_html.html > test_dir/cleaned_css.css
+sort-css test_dir/test_css.css --by_html test_dir/test_html.html > test_dir/cleaned_css.css
 ```
 
 
