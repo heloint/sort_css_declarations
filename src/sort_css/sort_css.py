@@ -153,6 +153,15 @@ def css_to_dict(css_content: str) -> dict[str, dict[str, str]]:
 
         if type(rule) == cssutils.css.csscomment.CSSComment:
             comment = rule.cssText
+        elif type(rule) == cssutils.css.CSSMediaRule:
+            print('## RULE')
+            print('===================')
+            print(rule.cssText)
+
+            for i in rule:
+                print('## SUB-RULE')
+                print('===================')
+                print(i.__dict__.keys())
         else:
             if rule.selectorText not in css_dict.keys():
                 css_dict.setdefault(rule.selectorText, {"comment": "", "props": ""})
