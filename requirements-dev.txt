@@ -12,4 +12,5 @@ pyparsing==3.0.9
 pytest==7.2.0
 soupsieve==2.3.2.post1
 tomli==2.0.1
+types-beautifulsoup4==4.11.6
 typing_extensions==4.4.0

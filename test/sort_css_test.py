@@ -115,5 +115,5 @@ def test_sort_css_by_html(input_x, expected):
 
 # PARAMETRIZE IT!
 def test_generate_output_str():
-    test_output_str = sort_css.generate_output_str(EXPECTED_SORTED_CSS_WITHOUT_HTML)
+    test_output_str = sort_css.generate_output_str(EXPECTED_SORTED_CSS_WITHOUT_HTML, {})
     assert test_output_str == EXPECTED_OUTPUT_WITHOUT_HTML
