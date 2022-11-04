@@ -4,8 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sort_css_declarations"
-version = "1.0.0"
-authors = [{name="Dániel Májer", email="majerdaniel93@gmail.com"}]
+version = "1.0.1"
+authors = [
+    {name="Dániel Májer", email="majerdaniel93@gmail.com"}
+]
 description = "Tool for sorting CSS file declarations."
 readme = "README.md"
 classifiers =[
