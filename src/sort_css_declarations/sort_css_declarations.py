@@ -387,9 +387,9 @@ def generate_output_str(
 
         # If they are import declarations..
         if key == "/*IMPORTS*/":
-            result_str += key
+            result_str += f'{key}\n'
 
-            for prop in value["props"]:
+            for prop in list(filter(None, value["props"])):
                 result_str += f"{prop};\n"
 
         # If they are normal CSS rules.
