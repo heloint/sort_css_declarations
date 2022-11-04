@@ -252,10 +252,13 @@ def sort_css_by_html(
     for html_elem in html_element_order:
         for css, value in css_dict.items():
 
+            base_selector: str = list(filter(None, re.split(" |:", css)))[0].strip()
+
             if (
                 # Split up the class or id from any selectors.
-                list(filter(None, re.split(" |:", css)))[0].strip() == html_elem
-                or list(filter(None, re.split(" |:", css)))[0].strip() == 'html'
+                base_selector == html_elem
+                or base_selector == 'html'
+                or css.startswith((':', '*')) # type: ignore
                 and css not in result
             ):
                 result[css] = value
@@ -320,13 +323,18 @@ def sort_media_queries_by_html(
     result: Dict[str, List[Dict[str, str | List[str]]]] = {}
 
     for html_elem in html_element_order:
+
         for media, dict_ls in media_rules_dict.items():
             
             for selector_dict in dict_ls:
 
+                base_selector: str = list(filter(None, re.split(" |:", selector_dict['css_selector'])))[0].strip() #type: ignore
+
                 if (
                     # Split up the class or id from any selectors.
-                    list(filter(None, re.split(" |:", selector_dict['css_selector'])))[0].strip() == html_elem # type: ignore
+                    base_selector == html_elem
+                    or base_selector == 'html'
+                    or selector_dict['css_selector'].startswith((':', '*')) # type: ignore
                     and media not in result
                 ):
                     result[media] = dict_ls
@@ -379,6 +387,10 @@ def generate_output_str(css_dict: Dict[str, Dict[str, str | List[str]]],
 
             for prop in selector_dict["props"]:
                 result_str += f"        {prop};\n"
+                result_str += "        }\n"
+
+            result_str += "    }\n"
+
 
     return result_str
 
