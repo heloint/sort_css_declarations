@@ -107,11 +107,12 @@ a{
     text-align: center;
 }
 
-/* @media screen and (max-width: 450px){
+@media screen and (max-width: 450px){
 	html{
 		font-size: 12px;
 	}
 
+    /*TESTYTEST*/
 	.main-header{
 		flex-flow: column;
 		gap: 15px;
@@ -124,4 +125,4 @@ a{
 		align-items: center;
 	}
 
-} */
+}

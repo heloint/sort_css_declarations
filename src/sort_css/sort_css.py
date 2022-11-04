@@ -7,6 +7,7 @@ from typing import Generator
 from typing import List
 from typing import Tuple
 from typing import Union
+from typing import Literal
 
 import bs4
 import cssutils  # type: ignore
@@ -145,6 +146,7 @@ def get_html_element_order(path: str) -> Tuple[str, ...]:
 def css_to_dict(css_content: str) -> dict[str, dict[str, str]]:
     "Reads, parses, converts CSS to dictionary."
 
+
     css_dict: dict[str, dict[str, str]] = {}
     sheet: cssutils.css.cssstylesheet.CSSStyleSheet = cssutils.parseString(css_content)
 
@@ -154,15 +156,9 @@ def css_to_dict(css_content: str) -> dict[str, dict[str, str]]:
 
         if type(rule) == cssutils.css.csscomment.CSSComment:
             comment = rule.cssText
-        # elif type(rule) == cssutils.css.CSSMediaRule:
-            # print('## RULE')
-            # print('===================')
-            # print(rule.cssText)
-
-            # for i in rule:
-            #     print('## SUB-RULE')
-            #     print('===================')
-            #     print(i.__dict__.keys())
+        elif type(rule) == cssutils.css.CSSMediaRule:
+            # The media queries will be processed in the media_rules_to_dict function.
+            pass 
 
         elif type(rule) == cssutils.css.CSSImportRule:
 
@@ -179,6 +175,7 @@ def css_to_dict(css_content: str) -> dict[str, dict[str, str]]:
             css_dict[rule.selectorText]["props"] = rule.style.cssText
 
             comment = ""
+
     return css_dict
 
 
@@ -258,14 +255,87 @@ def sort_css_by_html(
             if (
                 # Split up the class or id from any selectors.
                 list(filter(None, re.split(" |:", css)))[0].strip() == html_elem
+                or list(filter(None, re.split(" |:", css)))[0].strip() == 'html'
                 and css not in result
             ):
                 result[css] = value
 
     return result
 
+def media_rules_to_dict(css_content: str) -> Dict[str, List[Dict[str, str | List[str]]]]:
 
-def generate_output_str(css_dict: Dict[str, Dict[str, str | List[str]]]) -> str:
+    media_rule_token: re.Pattern= re.compile(r'(@media.*){')
+
+    sheet: cssutils.css.cssstylesheet.CSSStyleSheet = cssutils.parseString(css_content)
+
+    media_queries: List[cssutils.css.cssmediarule.CSSMediaRule] = \
+                    [x for x in sheet if isinstance(x, cssutils.css.cssmediarule.CSSMediaRule) ]
+
+    media_rules_dict: Dict[str, List[Dict[str, str | List[str]]]] = {}
+    comment: str = ""
+
+    for m_query in media_queries:
+        media_rule: str = re.findall(media_rule_token, m_query.cssText)[0]
+
+        if media_rule not in media_rules_dict.keys():
+            media_rules_dict.setdefault(media_rule, [])
+
+        for css_rule in m_query:
+
+            if type(css_rule) == cssutils.css.csscomment.CSSComment:
+                comment = css_rule.cssText
+
+            elif type(css_rule) == cssutils.css.CSSStyleRule:
+
+                props_ls: List[str] = list(map(lambda x: x.strip(';'), css_rule.style.cssText.split('\n')))
+
+                tmp: Dict[str, str | List[str]] = {}
+                tmp['css_selector'] = css_rule.selectorText
+                tmp['comment'] = comment
+                tmp['props']   = props_ls
+
+                media_rules_dict[media_rule].append(tmp)
+
+                # Reset the "comment collector"
+                comment = ''
+
+    result: Dict[str, List[Dict[str, str | List[str]]]] = {}
+
+    for key, value in media_rules_dict.items():
+        result.setdefault(key, [])
+        for selector_dict in value:
+            result[key].append({"css_selector": selector_dict["css_selector"], 
+                                "comment":  selector_dict["comment"], 
+                                "props": sorted(selector_dict["props"])})
+
+    return result
+
+
+def sort_media_queries_by_html(
+    media_rules_dict: Dict[str, List[Dict[str, str | List[str]]]], html_element_order: Tuple[str, ...]
+) -> Dict[str, List[Dict[str, str | List[str]]]]:
+    """Loops through the html_element_order identifiers, and return the
+    key-value from media_rules_dict in the order of the identifiers."""
+
+    result: Dict[str, List[Dict[str, str | List[str]]]] = {}
+
+    for html_elem in html_element_order:
+        for media, dict_ls in media_rules_dict.items():
+            
+            for selector_dict in dict_ls:
+
+                if (
+                    # Split up the class or id from any selectors.
+                    list(filter(None, re.split(" |:", selector_dict['css_selector'])))[0].strip() == html_elem # type: ignore
+                    and media not in result
+                ):
+                    result[media] = dict_ls
+
+    return result
+
+def generate_output_str(css_dict: Dict[str, Dict[str, str | List[str]]], 
+                        sorted_media_queries: Dict[str, List[Dict[str, str | List[str]]]]
+) -> str:
     "Loops through the CSS dictionary, then returns the content as a formated string."
 
     result_str: str = ""
@@ -294,6 +364,21 @@ def generate_output_str(css_dict: Dict[str, Dict[str, str | List[str]]]) -> str:
 
         if key != '/*IMPORTS*/':
             result_str += "}\n"
+
+    for key, value in sorted_media_queries.items():
+        result_str += f'\n{key} {{'
+
+        for selector_dict in value:
+
+            if selector_dict["comment"]:
+                result_str += f"\n    {selector_dict['comment']}\n"
+            else:
+                result_str += "\n"
+
+            result_str += f'    {selector_dict["css_selector"]} {{\n' #type: ignore
+
+            for prop in selector_dict["props"]:
+                result_str += f"        {prop};\n"
 
     return result_str
 
@@ -340,17 +425,21 @@ def main() -> None:
             css_dict
         )
 
+        media_rules_dict: Dict[str, List[Dict[str, str | List[str]]]] = media_rules_to_dict(css_content)
         # ===============================
         sorted_css: Dict[str, Dict[str, str | List[str]]]
+        sorted_media_queries: Dict[str, List[Dict[str, str | List[str]]]]
 
         if by_html:
             ordered_html_elems: Tuple[str, ...] = get_html_element_order(by_html)
             sorted_css = sort_css_by_html(formated_css_dict, ordered_html_elems)
+            sorted_media_queries = sort_media_queries_by_html(media_rules_dict, ordered_html_elems)
         else:
             sorted_css = sort_css_by_keys(formated_css_dict)
+            sorted_media_queries = media_rules_dict
         # ===============================
 
-        css_output: str = generate_output_str(sorted_css)
+        css_output: str = generate_output_str(sorted_css, sorted_media_queries)
 
         # ===============================
         if in_place:
