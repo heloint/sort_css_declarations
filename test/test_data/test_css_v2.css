@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&display=swap');
+
+:root{
+	--main-color: rgb(251, 251, 242);
+	--main-font: 'Open Sans', sans-serif;
+	--special-font: 'PT Serif', serif;
+	;
+}
+
+*, * ::after, * ::before{
+	box-sizing: border-box;
+}
+
+ul, ol{
+	list-style: none;
+}
+
+h1,h2,h3{
+	font-family: var(--special-font);
+}
+
+a{
+	color: inherit;
+	text-decoration: none;
+}
+
+
+.banner-container {
+    align-items: center;
+    background: #BEBEBE;
+    display: flex;
+    justify-content: center;
+}
+
+.form-container {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.form-wrapper {
+    align-items: center;
+    background: linear-gradient(90deg, rgba(218, 226, 218, 1) 26%, rgba(199, 199, 209, 1) 100%, rgba(0, 255, 23, 1) 100%);
+    background: rgb(218, 226, 218);
+    border-radius: 5px;
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    margin: 0.8rem 0 0 0;
+    padding: 1rem;
+}
+
+.upload-field {
+    align-items: center;
+    display: grid;
+    justify-content: center;
+}
+
+.submit-wrapper {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.button {
+    align-items: center;
+    border-radius: 12px;
+    border: 1px solid #787878;
+    box-shadow: transparent 0 0 0 3px, rgba(18, 18, 18, 0.1) 0 6px 20px;
+    box-sizing: border-box;
+    color: #121412;
+    cursor: pointer;
+    display: inline-flex;
+    font-family: Inter, sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    justify-content: center;
+    line-height: 1;
+    margin: 0.8rem 0 0 0;
+    outline: none;
+    padding: 0.8rem 1rem;
+    text-align: center;
+    text-decoration: none;
+    transition: box-shadow 0.2s, -webkit-box-shadow 0.2s;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.button:hover {
+    box-shadow: #C0C0C0 0 0 0 3px, transparent 0 0 0 0;
+}
+
+.output-container {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.output-wrapper {
+    width: 35rem;
+}
+
+/*TEST COMMENT*/
+.output-wrapper p {
+    text-align: center;
+}
+
+@media screen and (max-width: 450px){
+	html{
+		font-size: 12px;
+	}
+
+    /*TESTYTEST*/
+	.main-header{
+		flex-flow: column;
+		gap: 15px;
+		align-items: center;
+	}
+
+	.price-container {
+		flex-flow: column;
+		gap: 15px;
+		align-items: center;
+	}
+
+}
