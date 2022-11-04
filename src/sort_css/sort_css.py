@@ -149,19 +149,28 @@ def css_to_dict(css_content: str) -> dict[str, dict[str, str]]:
     sheet: cssutils.css.cssstylesheet.CSSStyleSheet = cssutils.parseString(css_content)
 
     comment = ""
+
     for rule in sheet.cssRules:
 
         if type(rule) == cssutils.css.csscomment.CSSComment:
             comment = rule.cssText
-        elif type(rule) == cssutils.css.CSSMediaRule:
-            print('## RULE')
-            print('===================')
-            print(rule.cssText)
+        # elif type(rule) == cssutils.css.CSSMediaRule:
+            # print('## RULE')
+            # print('===================')
+            # print(rule.cssText)
 
-            for i in rule:
-                print('## SUB-RULE')
-                print('===================')
-                print(i.__dict__.keys())
+            # for i in rule:
+            #     print('## SUB-RULE')
+            #     print('===================')
+            #     print(i.__dict__.keys())
+
+        elif type(rule) == cssutils.css.CSSImportRule:
+
+            if '/*IMPORTS*/' not in css_dict.keys():
+                css_dict.setdefault('/*IMPORTS*/', {"comment": "", "props": ""})
+
+            css_dict['/*IMPORTS*/']['comment'] = ''
+            css_dict['/*IMPORTS*/']['props'] += f'{rule.cssText}\n'
         else:
             if rule.selectorText not in css_dict.keys():
                 css_dict.setdefault(rule.selectorText, {"comment": "", "props": ""})
@@ -185,21 +194,31 @@ def format_css_dict(
         split_properties: list[str] = re.split(";", values["props"])
         split_properties = [prop.replace("\n", "").strip() for prop in split_properties]
 
-        for selector in selectors.split(","):
+        if selectors == '/*IMPORTS*/':
 
-            selector = selector.strip()
-
-            if selector not in formated_css_dict:
+            if '/*IMPORTS*/' not in formated_css_dict:
+                imports: List[str] = [prop.strip(';') for prop in values['props'].split('\n')]
                 formated_css_dict.setdefault(
-                    selector, {"comment": values["comment"], "props": split_properties}
+                    '/*IMPORTS*/', {"comment": values["comment"], "props": imports}
                 )
 
-            else:
-                formated_css_dict[selector]["comment"] += values["comment"]  # type: ignore
-                formated_css_dict[selector]["props"] = [
-                    *formated_css_dict[selector]["props"],
-                    *split_properties,
-                ]
+        else:
+
+            for selector in selectors.split(","):
+
+                selector = selector.strip()
+
+                if selector not in formated_css_dict:
+                    formated_css_dict.setdefault(
+                        selector, {"comment": values["comment"], "props": split_properties}
+                    )
+
+                else:
+                    formated_css_dict[selector]["comment"] += values["comment"]  # type: ignore
+                    formated_css_dict[selector]["props"] = [
+                        *formated_css_dict[selector]["props"],
+                        *split_properties,
+                    ]
 
     return {
         key: {"comment": value["comment"], "props": sorted(value["props"])}
@@ -211,6 +230,10 @@ def sort_css_by_keys(css_dict: Dict[str, Dict[str, str | List[str]]]) -> Dict[st
     """Orders the tags alphabetically, then ids, classes alphabetically.
     Return both as a merged dictionary."""
 
+    imports: Dict[str, Dict[str, str | List[str]]] = {
+        key: css_dict[key] for key in sorted(css_dict) if key == '/*IMPORTS*/'
+    }
+
     tags: Dict[str, Dict[str, str | List[str]]] = {
         key: css_dict[key] for key in sorted(css_dict) if not key.startswith((".", "#"))
     }
@@ -218,7 +241,7 @@ def sort_css_by_keys(css_dict: Dict[str, Dict[str, str | List[str]]]) -> Dict[st
         key: css_dict[key] for key in sorted(css_dict) if key.startswith((".", "#"))
     }
 
-    return {**tags, **ids_classes}
+    return {**imports, **tags, **ids_classes}
 
 
 def sort_css_by_html(
@@ -254,12 +277,23 @@ def generate_output_str(css_dict: Dict[str, Dict[str, str | List[str]]]) -> str:
         else:
             result_str += "\n"
 
-        result_str += f"{key} {{\n"
+        # If they are import declarations..
+        if key == '/*IMPORTS*/':
+            result_str += key
 
-        for prop in value["props"]:
-            result_str += f"    {prop};\n"
+            for prop in value["props"]:
+                result_str += f"{prop};\n"
 
-        result_str += "}\n"
+        # If they are normal CSS rules.
+        else:
+            result_str += f"{key} {{\n"
+
+            for prop in value["props"]:
+                result_str += f"    {prop};\n"
+
+
+        if key != '/*IMPORTS*/':
+            result_str += "}\n"
 
     return result_str
 
