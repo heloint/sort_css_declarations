@@ -3,7 +3,7 @@ import pytest
 
 sys.path.append("../src/sort_css_declarations")
 
-import sort_css
+import sort_css_declarations
 
 from typing import Generator
 from .expected_output_vars import EXPECTED_HTML_DICT 
@@ -32,7 +32,7 @@ TEST_INCOMPLETE_HTML_PATH = "./test_data/test_incomplete_html.html"
 
 
 def test_read_file():
-    data = sort_css.read_file(TEST_CSS_PATH)
+    data = sort_css_declarations.read_file(TEST_CSS_PATH)
     assert isinstance(data, str)
 
 
@@ -41,13 +41,13 @@ def test_parse():
     with open(TEST_HTML_PATH, 'r', encoding='UTF-8') as file:
         html_str = file.read()
 
-    test_output_dict = sort_css._parse(html_str)
+    test_output_dict = sort_css_declarations._parse(html_str)
 
     assert test_output_dict == EXPECTED_HTML_DICT 
 
 
 def test_convert_html_to_dict():
-    test_output_dict = sort_css.convert_html_to_dict(TEST_HTML_PATH)
+    test_output_dict = sort_css_declarations.convert_html_to_dict(TEST_HTML_PATH)
     
     assert test_output_dict == EXPECTED_HTML_DICT
 
@@ -60,7 +60,7 @@ def test_convert_html_to_dict():
     )
 )
 def test_get_identifiers_in_order(input_x, expected):
-    test_output_generator_complete = sort_css.get_identifiers_in_order(input_x)
+    test_output_generator_complete = sort_css_declarations.get_identifiers_in_order(input_x)
 
     assert isinstance(test_output_generator_complete, Generator)
     assert tuple(test_output_generator_complete) == expected
@@ -75,7 +75,7 @@ def test_get_identifiers_in_order(input_x, expected):
     )
 )
 def test_get_html_element_order(input_x, expected):
-    test_output_tuple = sort_css.get_html_element_order(input_x)
+    test_output_tuple = sort_css_declarations.get_html_element_order(input_x)
 
     assert test_output_tuple == expected
 
@@ -87,18 +87,18 @@ def test_css_to_dict():
     with open(TEST_CSS_PATH, 'r', encoding='UTF-8') as file:
         css_content = file.read()
 
-        test_output_dict = sort_css.css_to_dict(css_content)
+        test_output_dict = sort_css_declarations.css_to_dict(css_content)
 
         assert test_output_dict == EXPECTED_CSS_DICT
 
 
 def test_format_css_dict():
-    test_output_dict = sort_css.format_css_dict(EXPECTED_CSS_DICT)
+    test_output_dict = sort_css_declarations.format_css_dict(EXPECTED_CSS_DICT)
     assert test_output_dict == EXPECTED_FORMATTED_CSS_DICT
 
 
 def test_sort_css_by_keys():
-    test_output_dict = sort_css.sort_css_by_keys(EXPECTED_FORMATTED_CSS_DICT)
+    test_output_dict = sort_css_declarations.sort_css_by_keys(EXPECTED_FORMATTED_CSS_DICT)
     assert test_output_dict == EXPECTED_SORTED_CSS_WITHOUT_HTML
 
 
@@ -110,10 +110,10 @@ def test_sort_css_by_keys():
     )
 )
 def test_sort_css_by_html(input_x, expected):
-    test_output_dict = sort_css.sort_css_by_html(EXPECTED_FORMATTED_CSS_DICT, input_x)
+    test_output_dict = sort_css_declarations.sort_css_by_html(EXPECTED_FORMATTED_CSS_DICT, input_x)
     assert test_output_dict == expected
 
 # PARAMETRIZE IT!
 def test_generate_output_str():
-    test_output_str = sort_css.generate_output_str(EXPECTED_SORTED_CSS_WITHOUT_HTML, {})
+    test_output_str = sort_css_declarations.generate_output_str(EXPECTED_SORTED_CSS_WITHOUT_HTML, {})
     assert test_output_str == EXPECTED_OUTPUT_WITHOUT_HTML
