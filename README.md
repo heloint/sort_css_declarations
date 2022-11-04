@@ -1,17 +1,17 @@
-sort_css
+sort_css_declarations
 ========
 
 Sorts CSS declarations.
 
 ## Installation
 ```bash
-pip install sort_css
+pip install sort_css_declarations
 ```
 
 ## Console scripts
 
-Consult `sort-css --help` for the full set of options.
-`sort-css` takes filenames as positional arguments.
+Consult `sort-css-declarations --help` for the full set of options.
+`sort-css-declarations` takes filenames as positional arguments.
 
 Common options:
 - `-h, --help`         show this help message and exit
@@ -22,27 +22,27 @@ Common options:
 
 Result directly goes to stdout.
 ```bash
-sort-css test_dir/test_css.css
+sort-css-declarations test_dir/test_css.css
 ```
 
 File will be edited in-place with the result.
 ```bash
-sort-css -i test_dir/test_css.css
+sort-css-declarations -i test_dir/test_css.css
 ```
 
 Redirect the stdout to a new file.
 ```bash
-sort-css test_dir/test_css.css > test_dir/cleaned_css.css
+sort-css-declarations test_dir/test_css.css > test_dir/cleaned_css.css
 ```
 
 Result reordered by html directly goes to stdout.
 ```bash
-sort-css test_dir/test_css.css
+sort-css-declarations test_dir/test_css.css
 ```
 
 Reorder by html and redirect the stdout to a new file.
 ```bash
-sort-css test_dir/test_css.css --by_html test_dir/test_html.html > test_dir/cleaned_css.css
+sort-css-declarations test_dir/test_css.css --by_html test_dir/test_html.html > test_dir/cleaned_css.css
 ```
 
 

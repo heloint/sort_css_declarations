@@ -1,7 +1,7 @@
 import sys
 import pytest
 
-sys.path.append("../src/sort_css")
+sys.path.append("../src/sort_css_declarations")
 
 import sort_css
 
